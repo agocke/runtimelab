@@ -60,9 +60,10 @@ namespace System.Runtime.CompilerServices
                 }
                 else if (obj != null)
                 {
-                    Unsafe.As<IValueTaskSource>(obj).OnCompleted(ValueTaskAwaiter.s_invokeActionDelegate, continuation, _value._token,
+                    // Safe: obj is IValueTaskSource when it's not null or Task - validated by ValueTask construction
+                    unsafe { Unsafe.As<IValueTaskSource>(obj).OnCompleted(ValueTaskAwaiter.s_invokeActionDelegate, continuation, _value._token,
                         ValueTaskSourceOnCompletedFlags.FlowExecutionContext |
-                            (_value._continueOnCapturedContext ? ValueTaskSourceOnCompletedFlags.UseSchedulingContext : ValueTaskSourceOnCompletedFlags.None));
+                            (_value._continueOnCapturedContext ? ValueTaskSourceOnCompletedFlags.UseSchedulingContext : ValueTaskSourceOnCompletedFlags.None)) };
                 }
                 else
                 {
@@ -82,8 +83,9 @@ namespace System.Runtime.CompilerServices
                 }
                 else if (obj != null)
                 {
-                    Unsafe.As<IValueTaskSource>(obj).OnCompleted(ValueTaskAwaiter.s_invokeActionDelegate, continuation, _value._token,
-                        _value._continueOnCapturedContext ? ValueTaskSourceOnCompletedFlags.UseSchedulingContext : ValueTaskSourceOnCompletedFlags.None);
+                    // Safe: obj is IValueTaskSource when it's not null or Task - validated by ValueTask construction
+                    unsafe { Unsafe.As<IValueTaskSource>(obj).OnCompleted(ValueTaskAwaiter.s_invokeActionDelegate, continuation, _value._token,
+                        _value._continueOnCapturedContext ? ValueTaskSourceOnCompletedFlags.UseSchedulingContext : ValueTaskSourceOnCompletedFlags.None) };
                 }
                 else
                 {
@@ -102,8 +104,9 @@ namespace System.Runtime.CompilerServices
                 }
                 else if (obj != null)
                 {
-                    Unsafe.As<IValueTaskSource>(obj).OnCompleted(ThreadPool.s_invokeAsyncStateMachineBox, box, _value._token,
-                        _value._continueOnCapturedContext ? ValueTaskSourceOnCompletedFlags.UseSchedulingContext : ValueTaskSourceOnCompletedFlags.None);
+                    // Safe: obj is IValueTaskSource when it's not null or Task - validated by the Debug.Assert and the is Task check
+                    unsafe { Unsafe.As<IValueTaskSource>(obj).OnCompleted(ThreadPool.s_invokeAsyncStateMachineBox, box, _value._token,
+                        _value._continueOnCapturedContext ? ValueTaskSourceOnCompletedFlags.UseSchedulingContext : ValueTaskSourceOnCompletedFlags.None) };
                 }
                 else
                 {

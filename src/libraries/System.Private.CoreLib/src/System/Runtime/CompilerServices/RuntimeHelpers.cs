@@ -51,7 +51,8 @@ namespace System.Runtime.CompilerServices
                 // an array of the exact same backing type. The cast to T[] will
                 // never fail.
 
-                dest = Unsafe.As<T[]>(Array.CreateInstanceFromArrayType(array.GetType(), length));
+                // Safe: CreateInstanceFromArrayType creates an array of the same type, safe to cast to T[]
+                dest = unsafe { Unsafe.As<T[]>(Array.CreateInstanceFromArrayType(array.GetType(), length)) };
             }
 
             // In either case, the newly-allocated array is the exact same type as the

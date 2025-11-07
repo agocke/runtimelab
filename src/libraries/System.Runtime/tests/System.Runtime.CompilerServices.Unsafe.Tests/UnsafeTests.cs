@@ -446,7 +446,7 @@ namespace System.Runtime.CompilerServices
         public static void As()
         {
             object o = "Hello";
-            Assert.Equal("Hello", Unsafe.As<string>(o));
+            Assert.Equal("Hello", unsafe { Unsafe.As<string>(o) });
         }
 
         [Fact]
@@ -454,7 +454,7 @@ namespace System.Runtime.CompilerServices
         {
             // Verify that As does not perform type checks
             object o = new object();
-            Assert.IsType<object>(Unsafe.As<string>(o));
+            Assert.IsType<object>(unsafe { Unsafe.As<string>(o) });
         }
 
         [Fact]
@@ -552,7 +552,7 @@ namespace System.Runtime.CompilerServices
         {
             byte[] b = new byte[4] { 0x42, 0x42, 0x42, 0x42 };
 
-            ref int r = ref Unsafe.As<byte, int>(ref b[0]);
+            ref int r = ref unsafe { Unsafe.As<byte, int>(ref b[0]) };
             Assert.Equal(0x42424242, r);
 
             r = 0x0EF00EF0;
@@ -1408,9 +1408,9 @@ namespace System.Runtime.CompilerServices
             Assert.Equal(255UL, Unsafe.BitCast<S8, ulong>(*(S8*)misalignedPtr));
             Assert.Equal(255L, Unsafe.BitCast<S8, long>(*(S8*)misalignedPtr));
 
-            Half h = Unsafe.ReadUnaligned<Half>(ref Unsafe.As<S2, byte>(ref s2));
-            float s = Unsafe.ReadUnaligned<float>(ref Unsafe.As<S4, byte>(ref s4));
-            double d = Unsafe.ReadUnaligned<double>(ref Unsafe.As<S8, byte>(ref s8));
+            Half h = Unsafe.ReadUnaligned<Half>(ref unsafe { Unsafe.As<S2, byte>(ref s2) });
+            float s = Unsafe.ReadUnaligned<float>(ref unsafe { Unsafe.As<S4, byte>(ref s4) });
+            double d = Unsafe.ReadUnaligned<double>(ref unsafe { Unsafe.As<S8, byte>(ref s8) });
 
             Assert.Equal(h, Unsafe.BitCast<S2, Half>(s2));
             Assert.Equal(s, Unsafe.BitCast<S4, float>(s4));

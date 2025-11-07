@@ -563,8 +563,8 @@ namespace System.Buffers
                     unsafe
                     {
                         if (TBucketized.Value
-                            ? StartsWith<TCaseSensitivity>(ref matchRef, lengthRemaining, Unsafe.As<string[]>(bucket))
-                            : StartsWith<TCaseSensitivity>(ref matchRef, lengthRemaining, Unsafe.As<string>(bucket)))
+                            ? StartsWith<TCaseSensitivity>(ref matchRef, lengthRemaining, unsafe { Unsafe.As<string[]>(bucket) })
+                            : StartsWith<TCaseSensitivity>(ref matchRef, lengthRemaining, unsafe { Unsafe.As<string>(bucket) }))
                         {
                             return true;
                         }
@@ -611,8 +611,8 @@ namespace System.Buffers
                     unsafe
                     {
                         if (TBucketized.Value
-                            ? StartsWith<TCaseSensitivity>(ref matchRef, lengthRemaining, Unsafe.As<string[]>(bucket))
-                            : StartsWith<TCaseSensitivity>(ref matchRef, lengthRemaining, Unsafe.As<string>(bucket)))
+                            ? StartsWith<TCaseSensitivity>(ref matchRef, lengthRemaining, unsafe { Unsafe.As<string[]>(bucket) })
+                            : StartsWith<TCaseSensitivity>(ref matchRef, lengthRemaining, unsafe { Unsafe.As<string>(bucket) }))
                         {
                             return true;
                         }
@@ -659,8 +659,8 @@ namespace System.Buffers
                     unsafe
                     {
                         if (TBucketized.Value
-                            ? StartsWith<TCaseSensitivity>(ref matchRef, lengthRemaining, Unsafe.As<string[]>(bucket))
-                            : StartsWith<TCaseSensitivity>(ref matchRef, lengthRemaining, Unsafe.As<string>(bucket)))
+                            ? StartsWith<TCaseSensitivity>(ref matchRef, lengthRemaining, unsafe { Unsafe.As<string[]>(bucket) })
+                            : StartsWith<TCaseSensitivity>(ref matchRef, lengthRemaining, unsafe { Unsafe.As<string>(bucket) }))
                         {
                             return true;
                         }

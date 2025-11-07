@@ -53,7 +53,8 @@ namespace System.Linq
             bool result = true;
             if (source.GetType() == typeof(TSource[]))
             {
-                span = Unsafe.As<TSource[]>(source);
+                // Safe: source is TSource[] when is TSource[] check passes
+                span = unsafe { Unsafe.As<TSource[]>(source) };
             }
             else if (source.GetType() == typeof(List<TSource>))
             {

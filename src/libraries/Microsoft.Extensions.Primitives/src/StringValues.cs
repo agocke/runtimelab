@@ -106,7 +106,8 @@ namespace Microsoft.Extensions.Primitives
                 else
                 {
                     // Not string, not null, can only be string[]
-                    return Unsafe.As<string?[]>(value).Length;
+                    // Safe: value is string[] - validated by eliminating null and string cases
+                    return unsafe { Unsafe.As<string?[]>(value).Length };
                 }
             }
         }
@@ -147,7 +148,8 @@ namespace Microsoft.Extensions.Primitives
                 else if (value != null)
                 {
                     // Not string, not null, can only be string[]
-                    return Unsafe.As<string?[]>(value)[index]; // may throw
+                    // Safe: value is string[] - validated by eliminating null and string cases
+                    return unsafe { Unsafe.As<string?[]>(value)[index] }; // may throw
                 }
 
                 return OutOfBounds(); // throws
@@ -191,7 +193,8 @@ namespace Microsoft.Extensions.Primitives
 
                 Debug.Assert(value is string[]);
                 // value is not null or string, array, can only be string[]
-                string?[] values = Unsafe.As<string?[]>(value);
+                // Safe: value is string[] - validated by Debug.Assert
+                string?[] values = unsafe { Unsafe.As<string?[]>(value) };
                 return values.Length switch
                 {
                     0 => null,
@@ -290,7 +293,8 @@ namespace Microsoft.Extensions.Primitives
             else if (value != null)
             {
                 // value not array, can only be string
-                return new[] { Unsafe.As<string>(value) };
+                // Safe: value is string - validated by eliminating null and string[] cases
+                return new[] { unsafe { Unsafe.As<string>(value) } };
             }
             else
             {
@@ -327,7 +331,8 @@ namespace Microsoft.Extensions.Primitives
             if (value != null)
             {
                 // value not array, can only be string
-                return string.Equals(Unsafe.As<string>(value), item, StringComparison.Ordinal) ? 0 : -1;
+                // Safe: value is string - validated by eliminating null and string[] cases
+                return string.Equals(unsafe { Unsafe.As<string>(value) }, item, StringComparison.Ordinal) ? 0 : -1;
             }
 
             return -1;
@@ -381,7 +386,8 @@ namespace Microsoft.Extensions.Primitives
                 }
 
                 // value not array, can only be string
-                array[arrayIndex] = Unsafe.As<string>(value);
+                // Safe: value is string - validated by eliminating null and string[] cases
+                array[arrayIndex] = unsafe { Unsafe.As<string>(value) };
             }
         }
 
@@ -438,7 +444,8 @@ namespace Microsoft.Extensions.Primitives
             else
             {
                 // Not array, can only be string
-                return string.IsNullOrEmpty(Unsafe.As<string>(data));
+                // Safe: data is string - validated by eliminating null and string[] cases
+                return string.IsNullOrEmpty(unsafe { Unsafe.As<string>(data) });
             }
         }
 
@@ -753,7 +760,8 @@ namespace Microsoft.Extensions.Primitives
             }
             else
             {
-                return Unsafe.As<string>(value)?.GetHashCode() ?? Count.GetHashCode();
+                // Safe: value is string - validated by eliminating null and string[] cases
+                return unsafe { Unsafe.As<string>(value)?.GetHashCode() } ?? Count.GetHashCode();
             }
         }
 
@@ -776,7 +784,8 @@ namespace Microsoft.Extensions.Primitives
                 else
                 {
                     _current = null;
-                    _values = Unsafe.As<string?[]>(value);
+                    // Safe: value is string[] - validated by eliminating string case (null is also string[])
+                    _values = unsafe { Unsafe.As<string?[]>(value) };
                 }
                 _index = 0;
             }

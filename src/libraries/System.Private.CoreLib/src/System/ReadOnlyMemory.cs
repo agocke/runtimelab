@@ -209,6 +209,7 @@ namespace System
                         unsafe
                         {
                             refToReturn = ref Unsafe.As<char, T>(ref ((string)tmpObject).GetRawStringData());
+                            // Safe: tmpObject.GetType() == typeof(string) guaranteed by the if condition above
                             lengthOfUnderlyingSpan = Unsafe.As<string>(tmpObject).Length;
                         }
                     }
@@ -226,6 +227,7 @@ namespace System
                         // 'tmpObject is T[]' below also handles things like int[] <-> uint[] being convertible
                         Debug.Assert(tmpObject is T[]);
 
+                        // Safe: tmpObject is T[] as validated by the Debug.Assert and RuntimeHelpers.ObjectHasComponentSize check
                         unsafe
                         {
                             refToReturn = ref MemoryMarshal.GetArrayDataReference(Unsafe.As<T[]>(tmpObject));
@@ -335,21 +337,24 @@ namespace System
                     if (_index < 0)
                     {
                         // Unsafe.AsPointer is safe since it's pinned
-                        void* pointer = Unsafe.Add<T>(Unsafe.AsPointer(ref MemoryMarshal.GetArrayDataReference(Unsafe.As<T[]>(tmpObject))), _index & RemoveFlagsBitMask);
+                        // Safe: tmpObject is T[] as validated by the Debug.Assert and RuntimeHelpers.ObjectHasComponentSize check
+                        void* pointer = unsafe { Unsafe.Add<T>(Unsafe.AsPointer(ref MemoryMarshal.GetArrayDataReference(Unsafe.As<T[]>(tmpObject))), _index & RemoveFlagsBitMask) };
                         return new MemoryHandle(pointer);
                     }
                     else
                     {
                         // Unsafe.AsPointer is safe since the handle pins it
+                        // Safe: tmpObject is T[] as validated by the Debug.Assert and RuntimeHelpers.ObjectHasComponentSize check
                         GCHandle handle = GCHandle.Alloc(tmpObject, GCHandleType.Pinned);
-                        void* pointer = Unsafe.Add<T>(Unsafe.AsPointer(ref MemoryMarshal.GetArrayDataReference(Unsafe.As<T[]>(tmpObject))), _index);
+                        void* pointer = unsafe { Unsafe.Add<T>(Unsafe.AsPointer(ref MemoryMarshal.GetArrayDataReference(Unsafe.As<T[]>(tmpObject))), _index) };
                         return new MemoryHandle(pointer, handle);
                     }
                 }
                 else
                 {
                     Debug.Assert(tmpObject is MemoryManager<T>);
-                    return Unsafe.As<MemoryManager<T>>(tmpObject).Pin(_index);
+                    // Safe: tmpObject is MemoryManager<T> as validated by the Debug.Assert and elimination of other cases
+                    return unsafe { Unsafe.As<MemoryManager<T>>(tmpObject).Pin(_index) };
                 }
             }
 

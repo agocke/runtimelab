@@ -173,10 +173,11 @@ namespace System.Threading.Tasks
         {
             object? obj = _obj;
             Debug.Assert(obj == null || obj is Task || obj is IValueTaskSource);
+            // Safe: obj is IValueTaskSource when it's not null or Task - validated by the Debug.Assert and the as Task check
             return
                 obj == null ? Task.CompletedTask :
                 obj as Task ??
-                GetTaskForValueTaskSource(Unsafe.As<IValueTaskSource>(obj));
+                GetTaskForValueTaskSource(unsafe { Unsafe.As<IValueTaskSource>(obj) });
         }
 
         /// <summary>Gets a <see cref="ValueTask"/> that may be used at any point in the future.</summary>
@@ -310,7 +311,8 @@ namespace System.Threading.Tasks
                     return t.IsCompleted;
                 }
 
-                return Unsafe.As<IValueTaskSource>(obj).GetStatus(_token) != ValueTaskSourceStatus.Pending;
+                // Safe: obj is IValueTaskSource when it's not null or Task - validated by the Debug.Assert and the is Task check
+                return unsafe { Unsafe.As<IValueTaskSource>(obj).GetStatus(_token) } != ValueTaskSourceStatus.Pending;
             }
         }
 
@@ -333,7 +335,8 @@ namespace System.Threading.Tasks
                     return t.IsCompletedSuccessfully;
                 }
 
-                return Unsafe.As<IValueTaskSource>(obj).GetStatus(_token) == ValueTaskSourceStatus.Succeeded;
+                // Safe: obj is IValueTaskSource when it's not null or Task - validated by the Debug.Assert and the is Task check
+                return unsafe { Unsafe.As<IValueTaskSource>(obj).GetStatus(_token) } == ValueTaskSourceStatus.Succeeded;
             }
         }
 
@@ -355,7 +358,8 @@ namespace System.Threading.Tasks
                     return t.IsFaulted;
                 }
 
-                return Unsafe.As<IValueTaskSource>(obj).GetStatus(_token) == ValueTaskSourceStatus.Faulted;
+                // Safe: obj is IValueTaskSource when it's not null or Task - validated by the Debug.Assert and the is Task check
+                return unsafe { Unsafe.As<IValueTaskSource>(obj).GetStatus(_token) } == ValueTaskSourceStatus.Faulted;
             }
         }
 
@@ -382,7 +386,8 @@ namespace System.Threading.Tasks
                     return t.IsCanceled;
                 }
 
-                return Unsafe.As<IValueTaskSource>(obj).GetStatus(_token) == ValueTaskSourceStatus.Canceled;
+                // Safe: obj is IValueTaskSource when it's not null or Task - validated by the Debug.Assert and the is Task check
+                return unsafe { Unsafe.As<IValueTaskSource>(obj).GetStatus(_token) } == ValueTaskSourceStatus.Canceled;
             }
         }
 
@@ -401,7 +406,8 @@ namespace System.Threading.Tasks
                 }
                 else
                 {
-                    Unsafe.As<IValueTaskSource>(obj).GetResult(_token);
+                    // Safe: obj is IValueTaskSource when it's not null or Task - validated by the Debug.Assert and the is Task check
+                    unsafe { Unsafe.As<IValueTaskSource>(obj).GetResult(_token); }
                 }
             }
         }

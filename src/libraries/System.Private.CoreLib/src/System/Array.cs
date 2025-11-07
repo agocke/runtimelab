@@ -377,8 +377,9 @@ namespace System
                     (uint)length <= destinationArray.NativeLength)
                 {
                     nuint byteCount = (uint)length * (nuint)pMT->ComponentSize;
-                    ref byte src = ref Unsafe.As<RawArrayData>(sourceArray).Data;
-                    ref byte dst = ref Unsafe.As<RawArrayData>(destinationArray).Data;
+                    // Safe: Casting arrays to RawArrayData to access their underlying data - this is a runtime-internal pattern
+                    ref byte src = ref unsafe { Unsafe.As<RawArrayData>(sourceArray).Data };
+                    ref byte dst = ref unsafe { Unsafe.As<RawArrayData>(destinationArray).Data };
 
                     if (pMT->ContainsGCPointers)
                         Buffer.BulkMoveWithWriteBarrier(ref dst, ref src, byteCount);
@@ -409,8 +410,9 @@ namespace System
                 {
                     nuint elementSize = (nuint)pMT->ComponentSize;
                     nuint byteCount = (uint)length * elementSize;
-                    ref byte src = ref Unsafe.AddByteOffset(ref Unsafe.As<RawArrayData>(sourceArray).Data, (uint)sourceIndex * elementSize);
-                    ref byte dst = ref Unsafe.AddByteOffset(ref Unsafe.As<RawArrayData>(destinationArray).Data, (uint)destinationIndex * elementSize);
+                    // Safe: Casting arrays to RawArrayData to access their underlying data - this is a runtime-internal pattern
+                    ref byte src = ref Unsafe.AddByteOffset(ref unsafe { Unsafe.As<RawArrayData>(sourceArray).Data }, (uint)sourceIndex * elementSize);
+                    ref byte dst = ref Unsafe.AddByteOffset(ref unsafe { Unsafe.As<RawArrayData>(destinationArray).Data }, (uint)destinationIndex * elementSize);
 
                     if (pMT->ContainsGCPointers)
                         Buffer.BulkMoveWithWriteBarrier(ref dst, ref src, byteCount);
@@ -686,6 +688,7 @@ namespace System
             if (array == null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
 
+            // Safe: Casting array to RawArrayData to access its underlying data - this is a runtime-internal pattern
             ref byte p = ref Unsafe.As<RawArrayData>(array).Data;
             int lowerBound = 0;
 

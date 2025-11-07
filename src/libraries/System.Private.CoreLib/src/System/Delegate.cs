@@ -78,7 +78,8 @@ namespace System
         /// Gets a value that indicates whether the <see cref="Delegate"/> has a single invocation target.
         /// </summary>
         /// <value>true if the <see cref="Delegate"/> has a single invocation target.</value>
-        public bool HasSingleTarget => Unsafe.As<MulticastDelegate>(this).HasSingleTarget;
+        // Safe: All Delegate instances are actually MulticastDelegate instances at runtime
+        public bool HasSingleTarget => unsafe { Unsafe.As<MulticastDelegate>(this).HasSingleTarget };
 #endif
 
         /// <summary>
@@ -93,8 +94,9 @@ namespace System
         /// The order of the delegates returned by the enumerator is the same order in which the current delegate invokes the methods that those delegates represent.
         /// The method returns an empty enumerator for null delegate.
         /// </remarks>
+        // Safe: All Delegate instances are actually MulticastDelegate instances at runtime
         public static System.Delegate.InvocationListEnumerator<TDelegate> EnumerateInvocationList<TDelegate>(TDelegate? d) where TDelegate : System.Delegate
-            => new InvocationListEnumerator<TDelegate>(Unsafe.As<MulticastDelegate>(d));
+            => new InvocationListEnumerator<TDelegate>(unsafe { Unsafe.As<MulticastDelegate>(d) });
 
         /// <summary>
         /// Provides an enumerator for the invocation list of a delegate.
@@ -130,12 +132,10 @@ namespace System
                 int index = _index + 1;
                 unsafe
                 {
-                    unsafe
+                    // Safe: TryGetAt returns a Delegate, casting to TDelegate where TDelegate : Delegate is safe
+                    if ((_current = Unsafe.As<TDelegate>(_delegate?.TryGetAt(index))) == null)
                     {
-                        if ((_current = Unsafe.As<TDelegate>(_delegate?.TryGetAt(index))) == null)
-                        {
-                            return false;
-                        }
+                        return false;
                     }
                 }
                 _index = index;

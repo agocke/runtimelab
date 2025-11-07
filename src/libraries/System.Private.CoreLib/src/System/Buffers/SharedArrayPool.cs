@@ -60,6 +60,7 @@ namespace System.Buffers
             SharedArrayPoolThreadLocalArray[]? tlsBuckets = t_tlsBuckets;
             if (tlsBuckets is not null && (uint)bucketIndex < (uint)tlsBuckets.Length)
             {
+                // Safe: Array pool only stores T[] in each bucket, casting from Array to T[] is safe
                 unsafe
                 {
                     buffer = Unsafe.As<T[]>(tlsBuckets[bucketIndex].Array);
@@ -82,6 +83,7 @@ namespace System.Buffers
                 SharedArrayPoolPartitions? b = perCoreBuckets[bucketIndex];
                 if (b is not null)
                 {
+                    // Safe: Array pool only stores T[] in each bucket, casting from Array to T[] is safe
                     unsafe
                     {
                         buffer = Unsafe.As<T[]>(b.TryPop());

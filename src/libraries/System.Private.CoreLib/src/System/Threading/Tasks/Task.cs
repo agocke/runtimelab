@@ -2382,7 +2382,8 @@ namespace System.Threading.Tasks
         {
             Debug.Assert(obj is Task);
             // Only used privately to pass directly to EC.Run
-            Unsafe.As<Task>(obj).InnerInvoke();
+            // Safe: obj is Task as validated by the Debug.Assert
+            unsafe { Unsafe.As<Task>(obj).InnerInvoke(); }
         };
 
         /// <summary>

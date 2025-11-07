@@ -51,7 +51,8 @@ namespace System.Runtime.InteropServices
                 IntPtr handle = _handle;
                 GCHandle.CheckUninitialized(handle);
                 // Skip the type check to provide lowest overhead.
-                return Unsafe.As<T>(GCHandle.InternalGet(handle)!);
+                // Safe: PinnedGCHandle<T> stores T values, casting back to T is safe
+                return unsafe { Unsafe.As<T>(GCHandle.InternalGet(handle)!) };
             }
             set
             {

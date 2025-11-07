@@ -53,7 +53,8 @@ namespace System.Runtime.InteropServices
             IntPtr handle = _handle;
             GCHandle.CheckUninitialized(handle);
             // Skip the type check to provide lowest overhead.
-            T? obj = Unsafe.As<T>(GCHandle.InternalGet(handle));
+            // Safe: WeakGCHandle<T> stores T values, casting back to T is safe
+            T? obj = unsafe { Unsafe.As<T>(GCHandle.InternalGet(handle)) };
             target = obj;
             return obj != null;
         }

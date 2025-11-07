@@ -135,10 +135,12 @@ namespace System.Runtime.InteropServices
                 {
                     if (target.GetType() == typeof(string))
                     {
+                        // Safe: target.GetType() == typeof(string) guarantees the cast
                         return (IntPtr)Unsafe.AsPointer(ref Unsafe.As<string>(target).GetRawStringData());
                     }
 
                     Debug.Assert(target is Array);
+                    // Safe: target is Array as validated by the Debug.Assert and RuntimeHelpers.ObjectHasComponentSize
                     return (IntPtr)Unsafe.AsPointer(ref MemoryMarshal.GetArrayDataReference(Unsafe.As<Array>(target)));
                 }
 

@@ -112,7 +112,8 @@ namespace System
                 if (_comInfo != null)
                 {
                     // Check if the target is still null
-                    target = Unsafe.As<T>(GCHandle.InternalGet(_weakHandle));
+                    // Safe: _weakHandle was created with T value, casting back to T is safe
+                    target = unsafe { Unsafe.As<T>(GCHandle.InternalGet(_weakHandle)) };
                     if (target == null)
                     {
                         // Resolve and reset. Perform runtime cast to catch bugs
@@ -146,22 +147,25 @@ namespace System
                 GC.SuppressFinalize(newRef);
             }
 
-            return Unsafe.As<ComAwareWeakReference>(GCHandle.InternalGet(taggedHandle & ~HandleTagBits)!);
+            // Safe: GCHandle stores a ComAwareWeakReference, casting back is safe
+            return unsafe { Unsafe.As<ComAwareWeakReference>(GCHandle.InternalGet(taggedHandle & ~HandleTagBits)!) };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static ComAwareWeakReference GetFromTaggedReference(nint taggedHandle)
         {
             Debug.Assert((taggedHandle & ComAwareBit) != 0);
-            return Unsafe.As<ComAwareWeakReference>(GCHandle.InternalGet(taggedHandle & ~HandleTagBits)!);
+            // Safe: GCHandle stores a ComAwareWeakReference, casting back is safe
+            return unsafe { Unsafe.As<ComAwareWeakReference>(GCHandle.InternalGet(taggedHandle & ~HandleTagBits)!) };
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         internal static void SetTarget(ref nint taggedHandle, object? target, ComInfo? comInfo)
         {
+            // Safe: GCHandle stores a ComAwareWeakReference, casting back is safe
             ComAwareWeakReference comAwareRef = comInfo != null ?
                 EnsureComAwareReference(ref taggedHandle) :
-                Unsafe.As<ComAwareWeakReference>(GCHandle.InternalGet(taggedHandle & ~HandleTagBits)!);
+                unsafe { Unsafe.As<ComAwareWeakReference>(GCHandle.InternalGet(taggedHandle & ~HandleTagBits)!) };
 
             comAwareRef.SetTarget(target, comInfo);
         }

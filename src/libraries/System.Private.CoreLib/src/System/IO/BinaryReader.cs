@@ -357,7 +357,8 @@ namespace System.IO
                 if (_isMemoryStream)
                 {
                     Debug.Assert(_stream is MemoryStream);
-                    MemoryStream mStream = Unsafe.As<MemoryStream>(_stream);
+                    // Safe: _stream is MemoryStream when _isMemoryStream is true, validated by Debug.Assert
+                    MemoryStream mStream = unsafe { Unsafe.As<MemoryStream>(_stream) };
 
                     int position = mStream.InternalGetPosition();
                     numBytes = mStream.InternalEmulateRead(numBytes);
@@ -477,7 +478,8 @@ namespace System.IO
             {
                 // read directly from MemoryStream buffer
                 Debug.Assert(_stream is MemoryStream);
-                return Unsafe.As<MemoryStream>(_stream).InternalReadSpan(buffer.Length);
+                // Safe: _stream is MemoryStream when _isMemoryStream is true, validated by Debug.Assert
+                return unsafe { Unsafe.As<MemoryStream>(_stream).InternalReadSpan(buffer.Length) };
             }
             else
             {

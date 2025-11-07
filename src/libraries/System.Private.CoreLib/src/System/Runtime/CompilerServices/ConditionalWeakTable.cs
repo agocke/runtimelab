@@ -631,7 +631,8 @@ namespace System.Runtime.CompilerServices
                 Debug.Assert(key != null); // Key already validated as non-null
 
                 int entryIndex = FindEntry(key, out object? secondary);
-                value = Unsafe.As<TValue>(secondary);
+                // Safe: secondary is TValue based on how ConditionalWeakTable stores values
+                value = unsafe { Unsafe.As<TValue>(secondary) };
                 return entryIndex != -1;
             }
 
@@ -682,8 +683,9 @@ namespace System.Runtime.CompilerServices
 
                     if (oKey != null)
                     {
-                        key = Unsafe.As<TKey>(oKey);
-                        value = Unsafe.As<TValue>(oValue!);
+                        // Safe: oKey and oValue are TKey and TValue based on how ConditionalWeakTable stores entries
+                        key = unsafe { Unsafe.As<TKey>(oKey) };
+                        value = unsafe { Unsafe.As<TValue>(oValue!) };
                         return true;
                     }
                 }
@@ -711,6 +713,7 @@ namespace System.Runtime.CompilerServices
                 if (entryIndex != -1)
                 {
                     RemoveIndex(entryIndex);
+                    // Safe: valueObject is TValue based on how ConditionalWeakTable stores values
                     unsafe
                     {
                         value = Unsafe.As<TValue>(valueObject!);

@@ -132,6 +132,7 @@ namespace System.Runtime.InteropServices
             public static unsafe T GetInstance<T>(ComInterfaceDispatch* dispatchPtr) where T : class
             {
                 ManagedObjectWrapper* comInstance = ToManagedObjectWrapper(dispatchPtr);
+                // Safe: WrappedObject is T based on the ManagedObjectWrapper contract
                 return Unsafe.As<T>(comInstance->Holder!.WrappedObject);
             }
 
@@ -226,7 +227,8 @@ namespace System.Runtime.InteropServices
                     if (handle == IntPtr.Zero)
                         return null;
                     else
-                        return Unsafe.As<ManagedObjectWrapperHolder>(GCHandle.FromIntPtr(handle).Target);
+                        // Safe: GCHandle stores ManagedObjectWrapperHolder, casting back is safe
+                        return unsafe { Unsafe.As<ManagedObjectWrapperHolder>(GCHandle.FromIntPtr(handle).Target) };
                 }
             }
 

@@ -287,7 +287,8 @@ namespace System.Runtime.InteropServices
                     // The array may be prepinned, so remove the high bit from the start index in the line below.
                     // The ArraySegment<T> ctor will perform bounds checking on index & length.
 
-                    segment = new ArraySegment<T>(Unsafe.As<T[]>(obj), index & ReadOnlyMemory<T>.RemoveFlagsBitMask, length);
+                    // Safe: obj is T[] as validated by RuntimeHelpers.ObjectHasComponentSize and string check
+                    segment = new ArraySegment<T>(unsafe { Unsafe.As<T[]>(obj) }, index & ReadOnlyMemory<T>.RemoveFlagsBitMask, length);
                     return true;
                 }
                 else
@@ -408,7 +409,8 @@ namespace System.Runtime.InteropServices
             // enumerable. Otherwise, return an iterator dedicated to enumerating the object.
             if (RuntimeHelpers.ObjectHasComponentSize(obj)) // Same check as in TryGetArray to confirm that obj is a T[] or a U[] which is blittable to a T[].
             {
-                T[] array = Unsafe.As<T[]>(obj);
+                // Safe: obj is T[] as validated by RuntimeHelpers.ObjectHasComponentSize (same check as in TryGetArray)
+                T[] array = unsafe { Unsafe.As<T[]>(obj) };
                 index &= ReadOnlyMemory<T>.RemoveFlagsBitMask; // the array may be prepinned, so remove the high bit from the start index in the line below.
                 return index == 0 && length == array.Length ?
                     array :

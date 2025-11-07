@@ -72,7 +72,8 @@ namespace System.Runtime.InteropServices
             {
                 foreach (GCHandle weakNativeObjectWrapperHandle in s_referenceTrackerNativeObjectWrapperCache)
                 {
-                    ReferenceTrackerNativeObjectWrapper? nativeObjectWrapper = Unsafe.As<ReferenceTrackerNativeObjectWrapper>(weakNativeObjectWrapperHandle.Target);
+                    // Safe: GCHandle stores ReferenceTrackerNativeObjectWrapper, casting back is safe
+                    ReferenceTrackerNativeObjectWrapper? nativeObjectWrapper = unsafe { Unsafe.As<ReferenceTrackerNativeObjectWrapper>(weakNativeObjectWrapperHandle.Target) };
                     if (nativeObjectWrapper != null &&
                         nativeObjectWrapper._contextToken == contextToken)
                     {
